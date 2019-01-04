@@ -1,42 +1,134 @@
 <!DOCTYPE html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title></title>
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        body {
+            font-family: Helvetica,serif;
+        }
 
-        <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+        svg {
+            width: 500px;
+            height: 500px;
+        }
 
-        <link rel="stylesheet" href="css/normalize.css">
-        <link rel="stylesheet" href="css/main.css">
-        <script src="js/vendor/modernizr-2.6.2.min.js"></script>
-    </head>
-    <body>
-        <!--[if lt IE 7]>
-            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
-        <![endif]-->
+        .top-label {
+            font-size: 13px;
+            font-style: italic;
+            text-transform: uppercase;
+            float: left;
+        }
 
-        <!-- Add your site or application content here -->
-        <p>Hello world! This is HTML5 Boilerplate.</p>
+        .age-label {
+            text-align: right;
+            font-weight: bold;
+            width: 90px;
+            padding-right: 10px;
+        }
 
-        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-        <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.10.2.min.js"><\/script>')</script>
-        <script src="js/plugins.js"></script>
-        <script src="js/main.js"></script>
+        .clearfix {
+            clear: both;
+        }
 
-        <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
-        <script>
-            (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
-            function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
-            e=o.createElement(i);r=o.getElementsByTagName(i)[0];
-            e.src='//www.google-analytics.com/analytics.js';
-            r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
-            ga('create','UA-XXXXX-X');ga('send','pageview');
-        </script>
-    </body>
+        .bar {
+            fill: darkslateblue;
+        }
+
+        .x.axis line{
+            fill:none;
+            stroke:#000;
+        }
+
+        .axis path{
+            display:none;
+        }
+
+        .x.axis text{
+            font-size: 13px;
+        }
+
+        .y.axis line{
+            display: none;
+        }
+
+    </style>
+</head>
+<body>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+
+<script>
+    var margin={top:30, right:0, bottom:0, left:100 },
+        width=500 - margin.left-margin.right,
+        height = 450 - margin.top - margin.bottom;
+
+    var x =d3.scale.linear()
+        .range([0,width]);
+
+    var y=d3.scale.ordinal()
+        .rangeBands([0, height],0.2,0);
+
+    var xAxis=d3.svg.axis()
+        .scale(x)
+        .orient("top")
+        .ticks(5,"%");
+
+    var yAxis=d3.svg.axis()
+        .scale(y)
+        .orient("left");
+
+    const body = d3.select("body");
+    body.append("h2")
+        .text("Age distribution of the world, 2010");
+
+    body.append("div")
+        .attr("class","top-label age-label")
+        .append("p")
+        .text("age group");
+
+    body.append("div")
+        .attr("class","top-label")
+        .append("p")
+        .text("portion of the population");
+
+    body.append("div")
+        .attr("class","clearfix");
+
+    d3.csv("popData2010.csv",function (error,data) {
+        var popData=data;
+
+       x.domain([0, d3.max(popData,function (element) {return element.value;})]);
+
+        y.domain(popData.map(function (element) {return element.age;}));
+
+        var svg = body.append("svg")
+            .attr("width",width+margin.left+margin.right)
+            .attr("height",height+margin.top+margin.bottom)
+            .append("g")
+            .attr("transform","translate("+margin.left+","+margin.top+")");
+
+        svg.selectAll("rect")
+            .data(popData)
+            .enter().append("rect")
+            .attr("class","bar")
+            .attr("x",0)
+            .attr("height",y.rangeBand())
+            .attr("width",function (d) {
+                return x(d.value);
+            })
+            .attr("y",function (d) {
+                return y(d.age);
+            });
+
+        svg.append("g")
+            .call(xAxis)
+            .attr("class","x axis");
+        svg.append("g")
+            .call(yAxis)
+            .attr("class","y axis");
+    });
+
+
+</script>
+</body>
 </html>
