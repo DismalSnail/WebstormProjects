@@ -57,7 +57,6 @@
 <script src="http://d3js.org/d3.v3.min.js"></script>
 
 <script>
-    var year=2010;
     var margin = {top: 30, right: 0, bottom: 0, left: 100},
         width = 500 - margin.left - margin.right,
         height = 450 - margin.top - margin.bottom;
@@ -79,7 +78,7 @@
 
     const body = d3.select("body");
     body.append("h2")
-        .text(`Age distribution of the world, ${year}`);
+        .text("Age distribution of the world, 2010");
 
     body.append("div")
         .attr("class", "top-label age-label")
@@ -100,12 +99,10 @@
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    d3.csv("allData.csv", function (error, data) {
-        var popData = data.filter(function (element) {
-            return element.year==year;
-        });
+    d3.csv("popData2010.csv", function (error, data) {
+        var popData = data;
 
-        x.domain([0, d3.max(data, function (element) {
+        x.domain([0, d3.max(popData, function (element) {
             return element.value;
         })]);
 
