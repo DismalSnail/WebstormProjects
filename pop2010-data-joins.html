@@ -35,6 +35,18 @@
             fill: darkslateblue;
         }
 
+        .axis line{
+            fill:none;
+            stroke:#000;
+        }
+
+        .axis path{
+            display:none;
+        }
+
+        .axis text{
+            font-size: 13px;
+        }
         .bar-label {
             text-anchor: end;
         }
@@ -68,18 +80,22 @@
         {value:8.8,age:"5-9",position:15},
         {value:9.3,age:"0-4",position:16}];
 
+    var margin={top:30, right:0, bottom:0, left:100 },
+        width=500 - margin.left-margin.right,
+        height = 230 - margin.top - margin.bottom;
+
     var axisData=[0, 2.5, 5.0, 7.5];
-    var width=400,
-        leftMargin=100,
-        topMargin=30,
-        barHeight=20,
+    var barHeight=20,
         barGap=5,
         tickGap=5,
         tickHeight=10,
-        scaleFactor=width/popData[16].value,
-        barSpaceing = barHeight +barGap,
-        translateText="translate("+ leftMargin+","+topMargin+")",
-        scaleText="scale("+scaleFactor+",1)";
+        barSpaceing = barHeight +barGap;
+
+    var x =d3.scale.linear()
+        .domain([0, d3.max(popData,function (element) {
+            return element.value;
+        })])
+        .range([0,width]);
 
     const body = d3.select("body");
     body.append("h2")
@@ -98,10 +114,14 @@
     body.append("div")
         .attr("class","clearfix");
 
-    var svg = body.append("svg");
+    var svg = body.append("svg")
+        .attr("width",width+margin.left+margin.right)
+        .attr("height",height+margin.top+margin.bottom)
+       .append("g")
+        .attr("transform","translate("+margin.left+","+margin.top+")");
+
 
     var barGroup=svg.append("g")
-        .attr("transform",translateText+" "+scaleText)
         .attr("class","bar");
 
     barGroup.selectAll("rect")
@@ -110,14 +130,13 @@
                     .attr("x",0)
                     .attr("height",barHeight)
                     .attr("width",function (d) {
-                        return d.value;
+                        return x(d.value);
                     })
                     .attr("y",function (d) {
                         return d.position*barSpaceing;
                     });
 
     var barLabelGroup = svg.append("g")
-                            .attr("transform",translateText)
                             .attr("class","bar-label");
 
     barLabelGroup.selectAll("text")
@@ -131,36 +150,12 @@
             return d.age;
         });
 
-    var axisTickGroup = svg.append("g")
-        .attr("transform",translateText)
-        .attr("stroke","black");
+    var xAxis=d3.svg.axis()
+        .scale(x);
 
-    axisTickGroup.selectAll("line")
-        .data(axisData)
-        .enter().append("line")
-        .attr("x1",function (d) {
-            return d*scaleFactor;
-        })
-        .attr("x2",function (d) {
-            return d*scaleFactor;
-        })
-        .attr("y1",0)
-        .attr("y2",-tickHeight);
-
-    var axisLabelGroup=svg.append("g")
-        .attr("transform",translateText)
-        .attr("class","axis-label");
-
-    axisLabelGroup.selectAll("text")
-        .data(axisData)
-        .enter().append("text")
-        .attr("x",function (d) {
-            return d*scaleFactor;
-        })
-        .attr("y",-tickHeight-tickGap)
-        .text(function (d) {
-            return d+"%";
-        })
+    svg.append("g")
+        .call(xAxis)
+        .attr("class","axis")
 
 </script>
 </body>

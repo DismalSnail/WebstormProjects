@@ -82,9 +82,12 @@
         body.append("div")
             .attr("class","clearfix");
 
-        var svg = body.append("svg");
+        var svg = body.append("svg")
+            .append("g")
+            .attr("transform",translateText);
+
         var barGroup=svg.append("g")
-            .attr("transform",translateText+" "+scaleText)
+            .attr("transform",scaleText)
             .attr("class","bar");
         for (let i = 0; i < popData.length; i++) {
             barGroup.append("rect")
@@ -95,7 +98,7 @@
         }
 
         var barLabelGroup = svg.append("g")
-                                    .attr("transform",translateText)
+                                    //.attr("transform",translateText)
                                     .attr("class","bar-label");
 
         for (let i = 0; i < barLabels.length; i++) {
@@ -106,11 +109,11 @@
         }
 
         var axisTickGroup = svg.append("g")
-                                    .attr("transform",translateText)
+                                    //.attr("transform",translateText)
                                     .attr("stroke","black");
 
         var axisLabelGroup=svg.append("g")
-                                    .attr("transform","translate(100,30)")
+                                    //.attr("transform","translate(100,30)")
                                     .attr("class","axis-label");
 
         for (let i = 0; i < axisData.length; i++) {
