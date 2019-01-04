@@ -35,7 +35,7 @@
             fill: darkslateblue;
         }
 
-        .axis line{
+        .x.axis line{
             fill:none;
             stroke:#000;
         }
@@ -44,11 +44,12 @@
             display:none;
         }
 
-        .axis text{
+        .x.axis text{
             font-size: 13px;
         }
-        .bar-label {
-            text-anchor: end;
+
+        .y.axis line{
+            display: none;
         }
 
     </style>
@@ -58,37 +59,39 @@
 
 <script>
     var popData=[
-        {value:0.016,age:"80 and up",position:0},
-        {value:0.015,age:"75-79",position:1},
-        {value:0.021,age:"70-74",position:2},
-        {value:0.026,age:"65-69",position:3},
-        {value:0.034,age:"60-64",position:4},
-        {value:0.045,age:"55-59",position:5},
-        {value:0.051,age:"50-54",position:6},
-        {value:0.060,age:"45-40",position:7},
-        {value:0.066,age:"40-44",position:8},
-        {value:0.071,age:"35-39",position:9},
-        {value:0.073,age:"30-34",position:10},
-        {value:0.081,age:"25-29",position:11},
-        {value:0.089,age:"20-24",position:12},
-        {value:0.088,age:"15-19",position:13},
-        {value:0.086,age:"10-14",position:14},
-        {value:0.088,age:"5-9",position:15},
-        {value:0.093,age:"0-4",position:16}];
+        {value:0.016,age:"80 and up"},
+        {value:0.015,age:"75-79"},
+        {value:0.021,age:"70-74"},
+        {value:0.026,age:"65-69"},
+        {value:0.034,age:"60-64"},
+        {value:0.045,age:"55-59"},
+        {value:0.051,age:"50-54"},
+        {value:0.060,age:"45-40"},
+        {value:0.066,age:"40-44"},
+        {value:0.071,age:"35-39"},
+        {value:0.073,age:"30-34"},
+        {value:0.081,age:"25-29"},
+        {value:0.089,age:"20-24"},
+        {value:0.088,age:"15-19"},
+        {value:0.086,age:"10-14"},
+        {value:0.088,age:"5-9"},
+        {value:0.093,age:"0-4"}];
 
     var margin={top:30, right:0, bottom:0, left:100 },
         width=500 - margin.left-margin.right,
-        height = 230 - margin.top - margin.bottom;
-
-    var barHeight=20,
-        barGap=5,
-        barSpaceing = barHeight +barGap;
+        height = 450 - margin.top - margin.bottom;
 
     var x =d3.scale.linear()
         .domain([0, d3.max(popData,function (element) {
             return element.value;
         })])
         .range([0,width]);
+
+    var y=d3.scale.ordinal()
+        .domain(popData.map(function (element) {
+            return element.age;
+        }))
+        .rangeBands([0, height],0.2,0);
 
     const body = d3.select("body");
     body.append("h2")
@@ -114,34 +117,19 @@
         .attr("transform","translate("+margin.left+","+margin.top+")");
 
 
-    var barGroup=svg.append("g")
-        .attr("class","bar");
 
-    barGroup.selectAll("rect")
+    svg.selectAll("rect")
         .data(popData)
         .enter().append("rect")
+                    .attr("class","bar")
                     .attr("x",0)
-                    .attr("height",barHeight)
+                    .attr("height",y.rangeBand())
                     .attr("width",function (d) {
                         return x(d.value);
                     })
                     .attr("y",function (d) {
-                        return d.position*barSpaceing;
+                        return y(d.age);
                     });
-
-    var barLabelGroup = svg.append("g")
-                            .attr("class","bar-label");
-
-    barLabelGroup.selectAll("text")
-        .data(popData)
-        .enter().append("text")
-        .attr("x",-10)
-        .attr("y",function (d,i) {
-            return d.position*barSpaceing+barHeight*(2/3);
-        })
-        .text(function (d) {
-            return d.age;
-        });
 
     var xAxis=d3.svg.axis()
         .scale(x)
@@ -150,7 +138,14 @@
 
     svg.append("g")
         .call(xAxis)
-        .attr("class","axis")
+        .attr("class","x axis");
+
+    var yAxis=d3.svg.axis()
+        .scale(y)
+        .orient("left");
+    svg.append("g")
+        .call(yAxis)
+        .attr("class","y axis");
 
 </script>
 </body>
